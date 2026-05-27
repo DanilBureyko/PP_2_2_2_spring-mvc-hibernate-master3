@@ -1,0 +1,46 @@
+package PP2_3_1.dao;
+
+import PP2_3_1.model.User;
+import org.springframework.stereotype.Repository;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
+@Repository
+@Transactional
+public class UserDaoImpl implements UserDao {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Override
+    public List<User> getAllUser() {
+        return entityManager.createQuery("select u from PP2_3_1.model.User u", User.class)
+                .getResultList();
+    }
+
+    @Override
+    public void save(User user) {
+        entityManager.persist(user);
+
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        Optional<User> userById = findById(id);
+        userById.ifPresent(user -> entityManager.remove(user));
+    }
+
+    @Override
+    public void updateUser(User user) {
+        entityManager.merge(user);
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        User user = entityManager.find(User.class, id);
+        return Optional.ofNullable(user);
+    }
+}
